@@ -54,10 +54,12 @@ export function SiteHeader() {
               </a>
             </Button>
 
-            <Button
-              asChild
-              className="relative overflow-hidden shadow-sm"
-            >
+            {/* NUEVO: Login CRM */}
+            <Button asChild variant="secondary" className="hidden md:inline-flex">
+              <Link href="/login">Login</Link>
+            </Button>
+
+            <Button asChild className="relative overflow-hidden shadow-sm">
               <Link href="/contacto">
                 <span className="relative z-10">Contactame</span>
                 {/* glow */}
@@ -88,6 +90,15 @@ export function SiteHeader() {
               </Link>
             );
           })}
+
+          {/* NUEVO: Login CRM (mobile) */}
+          <Link
+            href="/login"
+            className="whitespace-nowrap rounded-full border border-border bg-background px-3 py-1 text-xs text-muted-foreground"
+          >
+            Login
+          </Link>
+
           <a
             href={site.links.whatsapp}
             target="_blank"

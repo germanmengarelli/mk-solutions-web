@@ -11,5 +11,6 @@ export const site = {
     { href: "/ftth", label: "FTTH & Redes" },
     { href: "/informatica", label: "Informática" },
     { href: "/contacto", label: "Contacto" },
+    
   ],
 };
