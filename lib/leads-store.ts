@@ -1,4 +1,4 @@
-import { sheetsClient, SHEET_ID } from "@/lib/sheets";
+import { domoGet, domoPost, domoPut, getDomoToken } from "@/lib/api-client";
 
 export type Lead = {
   lead_id: string;
@@ -11,60 +11,34 @@ export type Lead = {
   estado: string;
   origen: string;
   notas: string;
-  rowNumber?: number; // fila real en Sheets
 };
 
-function nowIso() {
-  return new Date().toISOString();
+// Map DOMO leads API response to the Lead type expected by the frontend
+function mapDomoLead(raw: any): Lead {
+  return {
+    lead_id: String(raw.id ?? raw.lead_id ?? ""),
+    created_at: raw.created_at ?? raw.creado_en ?? "",
+    owner_user_id: String(raw.usuario_id ?? raw.owner_user_id ?? ""),
+    empresa: raw.empresa ?? raw.nombre ?? "",
+    contacto: raw.contacto ?? "",
+    email: raw.email ?? "",
+    telefono: raw.telefono ?? "",
+    estado: raw.estado ?? "nuevo",
+    origen: raw.origen ?? "",
+    notas: raw.notas ?? raw.observaciones ?? "",
+  };
 }
 
-function makeLeadId() {
-  return `LEAD-${Date.now()}`;
-}
-
-export async function listLeads(params: { role: string; user_id: string }) {
-  const sheets = await sheetsClient();
-
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: "Leads!A2:J",
-  });
-
-  const rows = (res.data.values ?? []) as string[][];
-
-  const leads: Lead[] = rows
-    .filter((r) => r.length >= 1)
-    .map((r, idx) => {
-      const [
-        lead_id,
-        created_at,
-        owner_user_id,
-        empresa,
-        contacto,
-        email,
-        telefono,
-        estado,
-        origen,
-        notas,
-      ] = r;
-
-      return {
-        lead_id: lead_id ?? "",
-        created_at: created_at ?? "",
-        owner_user_id: owner_user_id ?? "",
-        empresa: empresa ?? "",
-        contacto: contacto ?? "",
-        email: email ?? "",
-        telefono: telefono ?? "",
-        estado: estado ?? "Nuevo",
-        origen: origen ?? "",
-        notas: notas ?? "",
-        rowNumber: idx + 2, // empieza en fila 2
-      };
-    });
-
-  if (params.role === "admin") return leads;
-  return leads.filter((l) => String(l.owner_user_id) === String(params.user_id));
+export async function listLeads(params: {
+  role: string;
+  user_id: string;
+}): Promise<Lead[]> {
+  const token = await getDomoToken();
+  // DOMO backend already handles role-based filtering via auth middleware
+  const raw = await domoGet<any>("/api/leads", token);
+  // The response may be { items: [...] } (paginated) or an array
+  const items = Array.isArray(raw) ? raw : raw.items ?? [];
+  return items.map(mapDomoLead);
 }
 
 export async function createLead(input: {
@@ -77,83 +51,29 @@ export async function createLead(input: {
   origen: string;
   notas: string;
 }) {
-  const sheets = await sheetsClient();
-
-  const row = [
-    makeLeadId(),
-    nowIso(),
-    input.owner_user_id,
-    input.empresa,
-    input.contacto,
-    input.email,
-    input.telefono,
-    input.estado,
-    input.origen,
-    input.notas,
-  ];
-
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: SHEET_ID,
-    range: "Leads!A:J",
-    valueInputOption: "RAW",
-    requestBody: { values: [row] },
+  const token = await getDomoToken();
+  await domoPost("/api/leads", token, {
+    nombre: input.empresa,
+    contacto: input.contacto,
+    email: input.email,
+    telefono: input.telefono,
+    estado: input.estado || "nuevo",
+    origen: input.origen,
+    observaciones: input.notas,
   });
 }
 
 export async function updateLead(lead_id: string, patch: Partial<Lead>) {
-  const sheets = await sheetsClient();
+  const token = await getDomoToken();
+  const body: any = {};
+  if (patch.empresa !== undefined) body.nombre = patch.empresa;
+  if (patch.contacto !== undefined) body.contacto = patch.contacto;
+  if (patch.email !== undefined) body.email = patch.email;
+  if (patch.telefono !== undefined) body.telefono = patch.telefono;
+  if (patch.estado !== undefined) body.estado = patch.estado;
+  if (patch.origen !== undefined) body.origen = patch.origen;
+  if (patch.notas !== undefined) body.observaciones = patch.notas;
+  if (patch.owner_user_id !== undefined) body.usuario_id = patch.owner_user_id;
 
-  // 1) Traigo todo para encontrar la fila
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: "Leads!A2:J",
-  });
-  const rows = (res.data.values ?? []) as string[][];
-
-  let foundIdx = -1;
-  for (let i = 0; i < rows.length; i++) {
-    if (String(rows[i][0] ?? "") === lead_id) {
-      foundIdx = i;
-      break;
-    }
-  }
-  if (foundIdx === -1) throw new Error("Lead no encontrado");
-
-  const rowNumber = foundIdx + 2;
-  const current = rows[foundIdx] ?? [];
-
-  const currentLead: Lead = {
-    lead_id: current[0] ?? "",
-    created_at: current[1] ?? "",
-    owner_user_id: current[2] ?? "",
-    empresa: current[3] ?? "",
-    contacto: current[4] ?? "",
-    email: current[5] ?? "",
-    telefono: current[6] ?? "",
-    estado: current[7] ?? "Nuevo",
-    origen: current[8] ?? "",
-    notas: current[9] ?? "",
-  };
-
-  const nextLead: Lead = { ...currentLead, ...patch };
-
-  const nextRow = [
-    nextLead.lead_id,
-    nextLead.created_at,
-    nextLead.owner_user_id,
-    nextLead.empresa,
-    nextLead.contacto,
-    nextLead.email,
-    nextLead.telefono,
-    nextLead.estado,
-    nextLead.origen,
-    nextLead.notas,
-  ];
-
-  await sheets.spreadsheets.values.update({
-    spreadsheetId: SHEET_ID,
-    range: `Leads!A${rowNumber}:J${rowNumber}`,
-    valueInputOption: "RAW",
-    requestBody: { values: [nextRow] },
-  });
+  await domoPut(`/api/leads/${lead_id}`, token, body);
 }

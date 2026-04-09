@@ -1,37 +1,4 @@
-import { sheetsClient, SHEET_ID } from "@/lib/sheets";
-
-function isActive(v: any) {
-  const s = String(v ?? "").trim().toLowerCase();
-  return s === "true" || s === "1" || s === "yes" || s === "si" || s === "sí";
-}
-
-export async function findUserByUsername(username: string) {
-  const sheets = await sheetsClient();
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: "Users!A2:H",
-  });
-
-  const rows = (res.data.values ?? []) as string[][];
-  const u = username.trim().toLowerCase();
-
-  for (const r of rows) {
-    const [user_id, name, email, uname, role, active, password_hash] = r;
-
-    if (String(uname ?? "").trim().toLowerCase() === u && isActive(active)) {
-      return {
-        user_id: user_id ?? "",
-        name: name ?? "",
-        email: email ?? "",
-        username: uname ?? "",
-        role: role ?? "",
-        active,
-        password_hash: password_hash ?? "",
-      };
-    }
-  }
-  return null;
-}
+import { domoGet, getDomoToken } from "@/lib/api-client";
 
 export type UserRow = {
   user_id: string;
@@ -42,26 +9,32 @@ export type UserRow = {
   active: any;
 };
 
-export async function listUsers() {
-  const sheets = await sheetsClient();
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: "Users!A2:H",
-  });
+/**
+ * Find user by username — used by auth. Since auth now goes through
+ * the DOMO backend directly (domoLogin), this is only kept for
+ * backward compatibility. Returns null (auth.ts no longer calls this).
+ */
+export async function findUserByUsername(
+  _username: string
+): Promise<null> {
+  return null;
+}
 
-  const rows = (res.data.values ?? []) as string[][];
-  return rows
-    .filter((r) => r.length >= 6)
-    .map((r) => {
-      const [user_id, name, email, username, role, active] = r;
-      return {
-        user_id: user_id ?? "",
-        name: name ?? "",
-        email: email ?? "",
-        username: username ?? "",
-        role: role ?? "",
-        active,
-      };
-    })
-    .filter((u) => u.user_id && u.username && isActive(u.active));
+/**
+ * List active users from the DOMO backend.
+ */
+export async function listUsers(): Promise<UserRow[]> {
+  const token = await getDomoToken();
+  const raw = await domoGet<any[]>("/api/usuarios", token);
+
+  return raw
+    .filter((u: any) => u.activo !== false)
+    .map((u: any) => ({
+      user_id: String(u.id),
+      name: u.nombre ?? "",
+      email: u.email ?? "",
+      username: u.email ?? "",
+      role: u.rol ?? "",
+      active: u.activo ?? true,
+    }));
 }

@@ -2,6 +2,8 @@ import { Hero } from "@/components/sections/hero";
 import { VerticalCards } from "@/components/sections/vertical-cards";
 import { CTABand } from "@/components/sections/cta-band";
 import { TrustStrip } from "@/components/sections/trust-strip";
+import { About } from "@/components/sections/about";
+import { Brands } from "@/components/sections/brands";
 
 export default function HomePage() {
   return (
@@ -16,9 +18,11 @@ export default function HomePage() {
         secondaryCtaHref="#verticales"
       />
       <TrustStrip />
+      <Brands />
       <div id="verticales">
         <VerticalCards />
       </div>
+      <About />
       <CTABand />
     </>
   );

@@ -9,7 +9,7 @@ export default function LoginClient() {
   const searchParams = useSearchParams();
   const next = searchParams.get("next") || "/crm";
 
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ export default function LoginClient() {
     setLoading(true);
 
     const res = await signIn("credentials", {
-      username,
+      username: email,
       password,
       redirect: false,
       callbackUrl: next,
@@ -41,19 +41,20 @@ export default function LoginClient() {
         onSubmit={onSubmit}
         className="w-full max-w-sm rounded-2xl border bg-card p-6"
       >
-        <h1 className="text-xl font-semibold">Acceso CRM</h1>
+        <h1 className="text-xl font-semibold">Acceso interno</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Ingresá tu usuario y contraseña.
+          Ingresá tu email y contraseña.
         </p>
 
         <div className="mt-5 grid gap-3">
           <input
             className="h-11 rounded-xl border bg-background px-3"
-            placeholder="Usuario"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
-            autoComplete="username"
+            autoComplete="email"
           />
           <input
             className="h-11 rounded-xl border bg-background px-3"

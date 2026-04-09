@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-
 import { rateLimitLogin } from "@/lib/rate-limit";
-import { appendRow } from "@/lib/sheets";
 
 export const runtime = "nodejs";
+
+const DOMO_API_URL = process.env.DOMO_API_URL || "http://localhost:3000";
 
 const ContactSchema = z.object({
   empresa: z.string().min(2, "Empresa requerida").max(120),
@@ -25,9 +25,6 @@ function getIp(req: Request) {
 export async function POST(req: Request) {
   try {
     const ip = getIp(req);
-    const ua = req.headers.get("user-agent") ?? "";
-
-    // ✅ Anti-spam: reutilizamos tu rate limit (según tu lib pide 2 args)
     await rateLimitLogin(req as any, ip);
 
     const body = await req.json();
@@ -47,26 +44,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true });
     }
 
-    const created_at = new Date().toISOString();
+    // Enviar al backend DOMO como lead
+    const res = await fetch(`${DOMO_API_URL}/api/contacto-web`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ empresa, contacto, email, necesidad }),
+    });
 
-    await appendRow("WebContacts", [
-      created_at,
-      empresa,
-      contacto,
-      email,
-      necesidad,
-      "web",
-      ip,
-      ua,
-    ]);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: "Error del servidor" }));
+      return NextResponse.json(
+        { ok: false, error: (err as any).error ?? "Error al enviar" },
+        { status: res.status }
+      );
+    }
 
     return NextResponse.json({ ok: true });
   } catch (e: any) {
-    // Si tu rateLimitLogin lanza error cuando se pasa de límite, caemos acá.
-    // Devolvemos 429 si detectamos algo típico, sino 500.
     const msg = e?.message ?? "Error servidor";
     const status = /rate|limit|429|too many/i.test(msg) ? 429 : 500;
-
     return NextResponse.json({ ok: false, error: msg }, { status });
   }
 }

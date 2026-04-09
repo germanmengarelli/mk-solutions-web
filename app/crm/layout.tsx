@@ -4,6 +4,26 @@ import { redirect } from "next/navigation";
 
 export const runtime = "nodejs";
 
+type NavItem = {
+  href: string;
+  label: string;
+  permisos?: string[];
+  adminOnly?: boolean;
+};
+
+const navItems: NavItem[] = [
+  { href: "/crm/dashboard", label: "Dashboard" },
+  { href: "/crm/kanban", label: "Kanban" },
+  { href: "/crm/leads", label: "Leads", permisos: ["leads"] },
+  { href: "/crm/clientes", label: "Clientes", permisos: ["clientes"] },
+  { href: "/crm/presupuestos", label: "Ordenes de Venta", permisos: ["presupuestos"] },
+  { href: "/crm/productos", label: "Productos", permisos: ["productos"] },
+  { href: "/crm/ordenes", label: "Órdenes", permisos: ["ordenes"] },
+  { href: "/crm/finanzas", label: "Finanzas", adminOnly: true },
+  { href: "/crm/comprobantes", label: "Comprobantes", adminOnly: true },
+  { href: "/crm/usuarios", label: "Usuarios", adminOnly: true },
+];
+
 export default async function CrmLayout({
   children,
 }: {
@@ -14,50 +34,72 @@ export default async function CrmLayout({
 
   const name = String((session as any)?.user?.name ?? "Usuario");
   const role = String((session as any)?.role ?? "");
+  const permisos: string[] = (session as any)?.permisos ?? [];
+  const isAdmin = role === "admin";
+
+  const rolLabel =
+    role === "admin"
+      ? "Admin"
+      : role === "comercial"
+        ? "Comercial"
+        : role === "vendedor"
+          ? "Vendedor"
+          : role;
+
+  const visibleNav = navItems.filter((item) => {
+    if (item.adminOnly && !isAdmin) return false;
+    if (item.permisos && !isAdmin) {
+      return item.permisos.some((p) => permisos.includes(p));
+    }
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-20 border-b bg-background/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="text-sm font-semibold">CRM MK Solutions</div>
+            <Link href="/crm/dashboard" className="text-sm font-semibold">
+              CRM MK Solutions
+            </Link>
             <span className="text-xs text-muted-foreground">
-              {name} {role ? `· ${role}` : ""}
+              {name} {rolLabel ? `· ${rolLabel}` : ""}
             </span>
           </div>
 
-          <nav className="flex items-center gap-2">
-            <Link
-              href="/crm/leads"
-              className="rounded-lg px-3 py-2 text-sm hover:bg-muted"
-            >
-              Leads
-            </Link>
-
+          <div className="flex items-center gap-1">
             <Link
               href="/"
-              className="rounded-lg px-3 py-2 text-sm hover:bg-muted"
+              className="rounded-lg px-2 py-1.5 text-xs hover:bg-muted"
             >
               Web
             </Link>
-
             <Link
               href="/api/auth/signout"
-              className="rounded-lg bg-foreground px-3 py-2 text-sm text-background"
+              className="rounded-lg bg-foreground px-2 py-1.5 text-xs text-background"
             >
               Salir
             </Link>
+          </div>
+        </div>
+
+        {/* Module nav — scrollable */}
+        <div className="border-t">
+          <nav className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 py-1.5">
+            {visibleNav.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-muted"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
         </div>
       </header>
 
-      <div className="mx-auto max-w-6xl px-4 py-8">{children}</div>
+      <div className="mx-auto max-w-7xl px-4 py-6">{children}</div>
     </div>
   );
 }
-<Link
-  href="/crm/tareas"
-  className="rounded-lg px-3 py-2 text-sm hover:bg-muted"
->
-  Tareas
-</Link>
