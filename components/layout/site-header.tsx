@@ -11,7 +11,7 @@ export function SiteHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/70 backdrop-blur">
+    <header className="sticky top-0 z-50 bg-[#0A1628]/90 backdrop-blur-lg">
       <div className="mx-auto max-w-6xl px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           {/* Left */}
@@ -30,14 +30,14 @@ export function SiteHeader() {
                   className={cn(
                     "relative text-sm font-medium transition",
                     active
-                      ? "text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "text-white"
+                      : "text-white/60 hover:text-white"
                   )}
                 >
                   {item.label}
                   <span
                     className={cn(
-                      "absolute -bottom-2 left-0 h-[2px] w-full origin-left scale-x-0 rounded-full bg-primary transition",
+                      "absolute -bottom-2 left-0 h-[2px] w-full origin-left scale-x-0 rounded-full bg-[#00B4D8] transition",
                       active && "scale-x-100"
                     )}
                   />
@@ -48,30 +48,34 @@ export function SiteHeader() {
 
           {/* Right CTAs */}
           <div className="flex items-center gap-2">
-            <Button asChild variant="secondary" className="hidden md:inline-flex">
+            <Button
+              asChild
+              variant="ghost"
+              className="hidden text-white/70 hover:bg-white/10 hover:text-white md:inline-flex"
+            >
               <a href={site.links.whatsapp} target="_blank" rel="noreferrer">
                 Cotizar por WhatsApp
               </a>
             </Button>
 
-            {/* NUEVO: Login CRM */}
-            <Button asChild variant="secondary" className="hidden md:inline-flex">
-              <Link href="/login">Login</Link>
+            <Button
+              asChild
+              variant="ghost"
+              className="hidden text-white/70 hover:bg-white/10 hover:text-white md:inline-flex"
+            >
+              <Link href="/login">Acceso interno</Link>
             </Button>
 
-            <Button asChild className="relative overflow-hidden shadow-sm">
-              <Link href="/contacto">
-                <span className="relative z-10">Contactame</span>
-                {/* glow */}
-                <span className="pointer-events-none absolute inset-0 opacity-0 transition-opacity hover:opacity-100">
-                  <span className="absolute -top-16 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.35),transparent_60%)] blur-2xl" />
-                </span>
-              </Link>
+            <Button
+              asChild
+              className="relative overflow-hidden bg-gradient-to-r from-[#00B4D8] to-[#0077B6] text-white shadow-[0_0_16px_rgba(0,180,216,0.3)] transition-shadow hover:shadow-[0_0_24px_rgba(0,180,216,0.5)]"
+            >
+              <Link href="/contacto">Contactame</Link>
             </Button>
           </div>
         </div>
 
-        {/* Mobile nav (simple + premium) */}
+        {/* Mobile nav */}
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1 md:hidden">
           {site.nav.map((item) => {
             const active = pathname === item.href;
@@ -82,8 +86,8 @@ export function SiteHeader() {
                 className={cn(
                   "whitespace-nowrap rounded-full border px-3 py-1 text-xs transition",
                   active
-                    ? "border-primary/40 bg-primary/10 text-foreground"
-                    : "border-border bg-background text-muted-foreground"
+                    ? "border-[#00B4D8]/40 bg-[#00B4D8]/10 text-white"
+                    : "border-white/10 bg-white/5 text-white/60"
                 )}
               >
                 {item.label}
@@ -91,19 +95,18 @@ export function SiteHeader() {
             );
           })}
 
-          {/* NUEVO: Login CRM (mobile) */}
           <Link
             href="/login"
-            className="whitespace-nowrap rounded-full border border-border bg-background px-3 py-1 text-xs text-muted-foreground"
+            className="whitespace-nowrap rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60"
           >
-            Login
+            Acceso interno
           </Link>
 
           <a
             href={site.links.whatsapp}
             target="_blank"
             rel="noreferrer"
-            className="whitespace-nowrap rounded-full border border-border bg-background px-3 py-1 text-xs text-muted-foreground"
+            className="whitespace-nowrap rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60"
           >
             WhatsApp
           </a>
