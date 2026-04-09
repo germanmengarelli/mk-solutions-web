@@ -233,6 +233,7 @@ export default async function CrmKanbanPage() {
     const proveedores = proveedoresFromItems(items);
     const nextStatus = resultado === "Aceptado" ? "Facturado" : "Propuesta";
 
+    const now = nowIso();
     const { currentCard, nextCard } = await updateCrmCard(code, {
       status: nextStatus,
       items,
@@ -242,11 +243,8 @@ export default async function CrmKanbanPage() {
       motivoRechazo,
       observaciones,
       responsable: usuario,
-      propuestaAt: currentCard.propuestaAt || nowIso(),
-      facturadoAt:
-        resultado === "Aceptado"
-          ? currentCard.facturadoAt || nowIso()
-          : currentCard.facturadoAt,
+      propuestaAt: now,
+      facturadoAt: resultado === "Aceptado" ? now : undefined,
     });
 
     await logAction({
@@ -285,7 +283,7 @@ export default async function CrmKanbanPage() {
     const { currentCard, nextCard } = await updateCrmCard(code, {
       cobrado,
       status: cobrado ? "Cobrado" : "Facturado",
-      cobradoAt: cobrado ? nowIso() : currentCard.cobradoAt,
+      cobradoAt: cobrado ? nowIso() : undefined,
     });
 
     await logAction({
