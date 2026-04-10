@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import CambiarPasswordButton from "./cambiar-password-button";
 
 export const runtime = "nodejs";
 
@@ -68,6 +69,7 @@ export default async function CrmLayout({
           </div>
 
           <div className="flex items-center gap-1">
+            <CambiarPasswordButton />
             <Link
               href="/"
               className="rounded-lg px-2 py-1.5 text-xs hover:bg-muted"

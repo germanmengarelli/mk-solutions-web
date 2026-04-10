@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { domoGet, domoPost } from "@/lib/api-client";
 import { revalidatePath } from "next/cache";
+import UsuariosTable from "./usuarios-table";
 
 export const runtime = "nodejs";
 
@@ -38,6 +39,7 @@ export default async function UsuariosPage() {
   }
 
   const token = (session as any)?.domo_token ?? "";
+  const currentUserEmail = String((session as any)?.user?.email ?? "");
   let usuarios: Usuario[] = [];
   let error = "";
 
@@ -138,55 +140,8 @@ export default async function UsuariosPage() {
         </form>
       </section>
 
-      {/* Tabla */}
-      <div className="rounded-2xl border bg-card">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-xs text-muted-foreground">
-                <th className="px-4 py-3 font-medium">Nombre</th>
-                <th className="px-4 py-3 font-medium">Email</th>
-                <th className="px-4 py-3 font-medium">Rol</th>
-                <th className="px-4 py-3 font-medium">Permisos</th>
-                <th className="px-4 py-3 font-medium">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {usuarios.map((u) => (
-                <tr key={u.id} className="border-b last:border-0 hover:bg-muted/40">
-                  <td className="px-4 py-3 font-medium">{u.nombre}</td>
-                  <td className="px-4 py-3">{u.email}</td>
-                  <td className="px-4 py-3">
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${u.rol === "admin" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>
-                      {u.rol}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-1">
-                      {(u.permisos || []).map((p) => (
-                        <span key={p} className="rounded bg-muted px-1.5 py-0.5 text-[10px]">{p}</span>
-                      ))}
-                      {!(u.permisos || []).length ? <span className="text-xs text-muted-foreground">—</span> : null}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`rounded-full px-2 py-0.5 text-xs ${u.activo !== false ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                      {u.activo !== false ? "Activo" : "Inactivo"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {!usuarios.length && !error ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                    Sin usuarios.
-                  </td>
-                </tr>
-              ) : null}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* Tabla con acciones */}
+      <UsuariosTable usuarios={usuarios} currentUserEmail={currentUserEmail} />
     </main>
   );
 }
