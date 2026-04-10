@@ -1,44 +1,33 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { loginAction } from "./actions";
 
 export default function LoginClient() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") || "/crm";
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function onSubmit(formData: FormData) {
     setErr(null);
     setLoading(true);
+    formData.set("next", next);
 
-    const res = await signIn("credentials", {
-      username: email,
-      password,
-      redirect: false,
-      callbackUrl: next,
-    });
+    const result = await loginAction(formData);
 
     setLoading(false);
-
-    if (!res) return setErr("No hubo respuesta del servidor.");
-    if (res.error) return setErr("Usuario o contraseña incorrectos.");
-
-    router.push(res.url ?? next);
-    router.refresh();
+    if (result?.error) {
+      setErr(result.error);
+    }
   }
 
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
       <form
-        onSubmit={onSubmit}
+        action={onSubmit}
         className="w-full max-w-sm rounded-2xl border bg-card p-6"
       >
         <h1 className="text-xl font-semibold">Acceso interno</h1>
@@ -51,8 +40,7 @@ export default function LoginClient() {
             className="h-11 rounded-xl border bg-background px-3"
             placeholder="Email"
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            name="email"
             required
             autoComplete="email"
           />
@@ -60,8 +48,7 @@ export default function LoginClient() {
             className="h-11 rounded-xl border bg-background px-3"
             placeholder="Contraseña"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            name="password"
             required
             autoComplete="current-password"
           />

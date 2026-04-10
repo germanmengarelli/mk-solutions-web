@@ -30,17 +30,21 @@ export async function domoLogin(
   password: string
 ): Promise<DomoLoginResponse | null> {
   try {
+    console.log("[domoLogin] Calling:", `${DOMO_API_URL}/api/auth/login`);
     const res = await fetch(`${DOMO_API_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
 
+    console.log("[domoLogin] Status:", res.status);
     if (!res.ok) return null;
 
     const data = (await res.json()) as DomoLoginResponse;
+    console.log("[domoLogin] Success, user:", data.usuario?.email);
     return data;
-  } catch {
+  } catch (err) {
+    console.error("[domoLogin] Error:", err);
     return null;
   }
 }

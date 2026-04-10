@@ -9,10 +9,11 @@ export async function middleware(req: Request) {
     return NextResponse.next();
   }
 
-  // Leemos el token de sesión (Edge-friendly)
+  // Auth.js v5 uses "authjs" cookie prefix instead of "next-auth"
   const token = await getToken({
     req: req as any,
     secret: process.env.AUTH_SECRET,
+    cookieName: "__Secure-authjs.session-token",
   });
 
   // Si no hay token, mandamos a /login
