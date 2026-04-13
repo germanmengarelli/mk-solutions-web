@@ -79,7 +79,7 @@ export default async function CotizacionPage({
   return (
     <>
       {/* Controls - hidden when printing */}
-      <div className="mb-6 flex items-center gap-4 print:hidden">
+      <div className="mb-6 flex items-center gap-4 print-hidden">
         <Link
           href={`/crm/kanban/${code}`}
           className="text-sm text-muted-foreground hover:underline"
@@ -90,7 +90,7 @@ export default async function CotizacionPage({
       </div>
 
       {/* Cotización document */}
-      <div className="mx-auto max-w-[210mm] rounded-2xl border bg-white p-8 shadow-sm print:rounded-none print:border-none print:shadow-none print:p-0">
+      <div className="cotizacion-doc mx-auto max-w-[210mm] rounded-2xl border bg-white p-8 shadow-sm">
         {/* Header / Membrete */}
         <header className="flex items-start justify-between border-b pb-6">
           <div className="flex items-center gap-4">

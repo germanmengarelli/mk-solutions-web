@@ -57,7 +57,7 @@ export default async function CrmLayout({
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-20 border-b bg-background/80 backdrop-blur">
+      <header className="print-hidden sticky top-0 z-20 border-b bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
             <Link href="/crm/dashboard" className="text-sm font-semibold">

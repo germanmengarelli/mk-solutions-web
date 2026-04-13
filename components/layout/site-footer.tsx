@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export function SiteFooter() {
   return (
-    <footer className="relative overflow-hidden bg-[#070E1A] text-white">
+    <footer className="print-hidden relative overflow-hidden bg-[#070E1A] text-white">
       <div className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-50" />
 
       <div className="relative mx-auto max-w-6xl px-4 py-12">

@@ -172,3 +172,39 @@
   border-color: rgba(0, 180, 216, 0.35);
   box-shadow: 0 0 24px rgba(0, 180, 216, 0.15);
 }
+
+/* ── Print: solo mostrar la cotización ── */
+@media print {
+  /* Ocultar header del sitio, footer del sitio, y header del CRM */
+  body > header,
+  body > footer,
+  body > main header,
+  body > main nav,
+  .print-hidden {
+    display: none !important;
+  }
+
+  /* Reset background y márgenes */
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  main,
+  main > div,
+  main > div > div {
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Limpiar el documento de cotización */
+  .cotizacion-doc {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+}

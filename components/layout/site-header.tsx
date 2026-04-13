@@ -11,7 +11,7 @@ export function SiteHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 bg-[#0A1628]/90 backdrop-blur-lg">
+    <header className="print-hidden sticky top-0 z-50 bg-[#0A1628]/90 backdrop-blur-lg">
       <div className="mx-auto max-w-6xl px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           {/* Left */}
