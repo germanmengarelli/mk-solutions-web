@@ -98,7 +98,7 @@ export default async function CotizacionPage({
             <img
               src="/logo-mk.png"
               alt="MK Solutions"
-              className="h-14 w-auto"
+              className="h-20 w-auto"
             />
             <div>
               <div className="text-xl font-bold text-[#18417c]">

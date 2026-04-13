@@ -60,7 +60,9 @@ export default async function CrmLayout({
       <header className="print-hidden sticky top-0 z-20 border-b bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <Link href="/crm/dashboard" className="text-sm font-semibold">
+            <Link href="/crm/dashboard" className="flex items-center gap-2 text-sm font-semibold">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo-mk.png" alt="MK Solutions" className="h-8 w-auto" />
               CRM MK Solutions
             </Link>
             <span className="text-xs text-muted-foreground">
