@@ -175,11 +175,7 @@
 
 /* ── Print: solo mostrar la cotización ── */
 @media print {
-  /* Ocultar header del sitio, footer del sitio, y header del CRM */
-  body > header,
-  body > footer,
-  body > main header,
-  body > main nav,
+  /* Ocultar header del sitio, footer del sitio, nav del CRM y controles */
   .print-hidden {
     display: none !important;
   }
