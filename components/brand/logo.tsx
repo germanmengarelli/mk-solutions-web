@@ -7,7 +7,7 @@ export function BrandLogo({
 }) {
   const sizes = {
     sm: 40,
-    md: 56,
+    md: 78,
     lg: 88,
   };
 
