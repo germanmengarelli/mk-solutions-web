@@ -60,14 +60,6 @@ export function SiteHeader() {
 
             <Button
               asChild
-              variant="ghost"
-              className="hidden text-white/70 hover:bg-white/10 hover:text-white md:inline-flex"
-            >
-              <a href="https://mksolutions-crm.vercel.app/login" rel="noreferrer">Acceso interno</a>
-            </Button>
-
-            <Button
-              asChild
               className="relative overflow-hidden bg-gradient-to-r from-[#00B4D8] to-[#0077B6] text-white shadow-[0_0_16px_rgba(0,180,216,0.3)] transition-shadow hover:shadow-[0_0_24px_rgba(0,180,216,0.5)]"
             >
               <Link href="/contacto">Contactame</Link>
@@ -94,14 +86,6 @@ export function SiteHeader() {
               </Link>
             );
           })}
-
-          <a
-            href="https://mksolutions-crm.vercel.app/login"
-            rel="noreferrer"
-            className="whitespace-nowrap rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60"
-          >
-            Acceso interno
-          </a>
 
           <a
             href={site.links.whatsapp}
