@@ -63,7 +63,7 @@ export function SiteHeader() {
               variant="ghost"
               className="hidden text-white/70 hover:bg-white/10 hover:text-white md:inline-flex"
             >
-              <a href="https://mksolutions-crm.vercel.app" target="_blank" rel="noreferrer">Acceso interno</a>
+              <Link href="/login">Acceso interno</Link>
             </Button>
 
             <Button
@@ -95,14 +95,12 @@ export function SiteHeader() {
             );
           })}
 
-          <a
-            href="https://mksolutions-crm.vercel.app"
-            target="_blank"
-            rel="noreferrer"
+          <Link
+            href="/login"
             className="whitespace-nowrap rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60"
           >
             Acceso interno
-          </a>
+          </Link>
 
           <a
             href={site.links.whatsapp}
