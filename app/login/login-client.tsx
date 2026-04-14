@@ -6,7 +6,7 @@ import { loginAction } from "./actions";
 
 export default function LoginClient() {
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") || "/crm/redirect";
+  const next = searchParams.get("next") || "/crm";
 
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
